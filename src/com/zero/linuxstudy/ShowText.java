@@ -84,8 +84,8 @@ public class ShowText extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-//		int tempsize=1024;
-//		int len = (int)Math.ceil(((float)text.length()/tempsize));
+		int tempsize=5120;// 分页语音阅读的每页大小，即是每次读的文字大小，补一次全部读完是因为文字过多，读取不了
+		int len = (int)Math.ceil(((float)text.length()/tempsize));
 		
 		switch(item.getItemId()){	
 			case R.id.read_vioce:
@@ -93,14 +93,23 @@ public class ShowText extends Activity {
 				if(read_status==1){
 					Toast.makeText(this,"开始阅读啦！",Toast.LENGTH_SHORT).show();
 					textToSpeech.speak(text,TextToSpeech.QUEUE_FLUSH, null);
-//					for(int x=0;x<len;x++){
-//						Toast.makeText(this,len+"开始阅读啦！"+x,Toast.LENGTH_SHORT).show();
-//						if(x==len-1)
-//						textToSpeech.speak(text.substring(x*tempsize+1,(x+1)*tempsize-text.length()),TextToSpeech.QUEUE_FLUSH, null);
-//						else{
-//							textToSpeech.speak(text.substring(x*tempsize+1,(x+1)*tempsize),TextToSpeech.QUEUE_FLUSH, null);
+					int filelength = text.length();//要读取文件的长度
+					for(int x=0;x<len;x++){
+						Toast.makeText(this,len+"开始阅读啦！"+x,Toast.LENGTH_SHORT).show();
+//						if(x==len-1){
+//							textToSpeech.speak(text.substring(x*tempsize+1,text.length()),TextToSpeech.QUEUE_FLUSH, null);
+//							break;
 //						}
-//					}
+//						if(x!=len-1){
+//							textToSpeech.speak(text.substring(x*tempsize+1,(x+1)*tempsize),TextToSpeech.QUEUE_FLUSH, null);
+//							continue;
+//						}
+						if(x == 0 ){//每段开始阅读的开始下标，小于零越界，要做赋值0处理
+							textToSpeech.speak(text.substring(0,filelength-tempsize*(len-1)),TextToSpeech.QUEUE_FLUSH, null);
+						}else{
+							textToSpeech.speak(text.substring(filelength-tempsize*(len-x),filelength-tempsize*(len-1-x)),TextToSpeech.QUEUE_FLUSH, null);							
+						}
+					}
 				}else{
 					Toast.makeText(this,"停止阅读啦！",Toast.LENGTH_SHORT).show();
 					textToSpeech.speak("",TextToSpeech.QUEUE_FLUSH, null);
